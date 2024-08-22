@@ -91,10 +91,10 @@ if __name__ == "__main__":
         print('wws: Website Wordlist Scan')
         print('usage: wsws WEBSITE WORDLIST [OPTIONS]')
         print('notes:')
-        print('    the website must contain the "$$$" placeholder, which tells the program where to put the words from the wordlist')
+        print('    the website must contain the "HERE" placeholder, which tells the program where to put the words from the wordlist')
         print('    e.g.')
-        print('        http://google.com/$$$   scans for pages')
-        print('        http://$$$.google.com/  scans for subdomains')
+        print('        http://google.com/HERE   scans for pages')
+        print('        http://HERE.google.com/  scans for subdomains')
         print('\noptions:')
         print('    -a | --accept CODES       List of status codes to accept, comma separated (default is 200,201,202,203,204,205,206,207,208)')
         print('    -f | --follow             Follow redirects')
@@ -163,8 +163,8 @@ if __name__ == "__main__":
     if 'http://' not in domain and 'https://' not in domain:
         domain = 'http://' + domain
 
-    if '$$$' not in domain:
-        print('"$$$" placeholder missing')
+    if 'HERE' not in domain:
+        print('"HERE" placeholder missing')
         sys.exit(1)
 
     wordlist = args[1]

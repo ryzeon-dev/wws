@@ -31,10 +31,10 @@ python3 wws.py --help
 wws: Website Wordlist Scan
 usage: wsws WEBSITE WORDLIST [OPTIONS]
 notes:
-    the website must contain the "$$$" placeholder, which tells the program where to put the words from the wordlist
+    the website must contain the "HERE" placeholder, which tells the program where to put the words from the wordlist
     e.g.
-        http://google.com/$$$   scans for pages
-        http://$$$.google.com/  scans for subdomains
+        http://google.com/HERE   scans for pages
+        http://HERE.google.com/  scans for subdomains
 
 options:
     -a | --accept CODES       List of status codes to accept, comma separated (default is 200,201,202,203,204,205,206,207,208)
