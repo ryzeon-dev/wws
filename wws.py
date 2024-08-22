@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import requests 
 from threading import Thread, Semaphore 
 import time 
@@ -70,7 +72,7 @@ class Threadpool:
 def check(domain, target):
     global printer
     
-    url = domain.replace('$$$', target)
+    url = domain.replace('HERE', target)
     printer.print(f'\rtrying {url}', end='')
 
     try:
