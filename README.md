@@ -27,7 +27,6 @@ python3 -m pip install -r requirements
 
 ## Usage
 ```
-python3 wws.py --help
 wws: Website Wordlist Scan
 usage: wsws WEBSITE WORDLIST [OPTIONS]
 notes:
@@ -40,5 +39,6 @@ options:
     -a | --accept CODES       List of status codes to accept, comma separated (default is 200,201,202,203,204,205,206,207,208)
     -f | --follow             Follow redirects
     -h | --help               Show this message and exit
+    -r | --reject CODES       List of status codes to reject, comma separated; if specified, the accepted list is ignored
     -t | --threads THREADS    Number of parallel threads, default is 8
 ```

@@ -4,8 +4,12 @@ import requests
 from threading import Thread, Semaphore 
 import time 
 
+REJECT = []
 ACCEPT = [200, 201, 202, 203, 204, 205, 206, 207, 208]
 REDIRECTS = False
+
+WORDS_COUNT = 0
+CHECKED = 0
 
 class Printer:
     def __init__(self):
@@ -70,10 +74,11 @@ class Threadpool:
                 thread.join()
 
 def check(domain, target):
-    global printer
+    global printer, CHECKED, REJECT, ACCEPT, REDIRECTS
     
     url = domain.replace('HERE', target)
-    printer.print(f'\rtrying {url}', end='')
+    CHECKED += 1
+    printer.print(f'\r[{CHECKED}/{WORDS_COUNT}] trying {url}', end='')
 
     try:
         response = requests.get(url, allow_redirects=REDIRECTS)
@@ -82,8 +87,15 @@ def check(domain, target):
         return
     
     else:
-        if (code := response.status_code) in ACCEPT:
-            printer.print(f'\r>> {url} -> code {code}')
+        code = response.status_code
+        if REJECT: 
+            if code not in REJECT:
+                printer.print(f'\r>> {url} -> code {code}')
+        
+        else:
+            if code in ACCEPT:
+                printer.print(f'\r>> {url} -> code {code}')
+        
 
 if __name__ == "__main__":
     import sys 
@@ -101,6 +113,7 @@ if __name__ == "__main__":
         print('    -a | --accept CODES       List of status codes to accept, comma separated (default is 200,201,202,203,204,205,206,207,208)')
         print('    -f | --follow             Follow redirects')
         print('    -h | --help               Show this message and exit')
+        print('    -r | --reject CODES       List of status codes to reject, comma separated; if specified, the accepted list is ignored')
         print('    -t | --threads THREADS    Number of parallel threads, default is 8')
         sys.exit(0)
 
@@ -112,6 +125,28 @@ if __name__ == "__main__":
         args.remove('--follow')
         REDIRECTS = True
     
+    if '-r' in args:
+        index = args.index('-r')
+        args.pop(index)
+
+        try:
+            REJECT = [int(code) for code in args.pop(index).split(',')]
+        except:
+            print('Error: rejected status codes must be integers comma separated')
+            sys.exit(1)
+
+    elif '--reject' in args:
+        index = args.index('--reject')
+        args.pop(index)
+
+        try:
+            REJECT = [int(code) for code in args.pop(index).split(',')]
+        except:
+            print('Error: rejected status codes must be integers comma separated')
+            sys.exit(1)
+
+
+
     if '-a' in args:
         index = args.index('-a')
         args.pop(index)
@@ -121,6 +156,7 @@ if __name__ == "__main__":
 
         except:
             print('Error: accepted status codes must be integers comma separated')
+            sys.exit(1)
 
     elif '--accept' in args:
         index = args.index('--accept')
@@ -131,6 +167,7 @@ if __name__ == "__main__":
 
         except:
             print('Error: accepted status codes must be integers comma separated')
+            sys.exit(1)
 
     if '-t' in args:
         index = args.index('-t')
@@ -141,7 +178,7 @@ if __name__ == "__main__":
         
         except:
             print('Error: threads number must be an integer')
-            sys.exit(0)
+            sys.exit(1)
 
     elif '--threads' in args:
         index = args.index('--threads')
@@ -152,7 +189,7 @@ if __name__ == "__main__":
         
         except:
             print('Error: threads number must be an integer')
-            sys.exit(0)
+            sys.exit(1)
     
     else:
         threads = 8
@@ -178,6 +215,8 @@ if __name__ == "__main__":
     except Exception as e:
         print(f'Error: cannot read wordlist file "{wordlist}" because {e}')
     
+    WORDS_COUNT = len(words)
+
     try:
         threadPool = Threadpool(threads)
 
@@ -191,4 +230,3 @@ if __name__ == "__main__":
     except:
         print('\nAbort signal received, killing threads')
         threadPool.killAll()
-        
